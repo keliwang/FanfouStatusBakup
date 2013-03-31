@@ -5,6 +5,7 @@ import (
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
+	"strings"
 )
 
 // Create a new sqlite database
@@ -51,13 +52,20 @@ func OpenDB(dbName string) (*sql.DB, error) {
 	return db, nil
 }
 
+// Escape ' and " which are in the sql queries
+func escapedQuotes(text string) string {
+	escapedText := strings.Replace(text, "'", "''", -1)
+	escapedText = strings.Replace(escapedText, `"`, `""`, -1)
+
+	return escapedText
+}
+
 // Insert one status into our table
 func InsertOneStatus(db *sql.DB, status Status) error {
 	insertPattern := `INSERT INTO STATUSES(created_at, id, rawid, text, source) VALUES (
 			"%s", "%s", %d, "%s", "%s");`
 	insertSql := fmt.Sprintf(insertPattern, status.CreatedAt, status.Id,
-		status.RawId, status.Text, status.Source)
-
+		status.RawId, escapedQuotes(status.Text), escapedQuotes(status.Source))
 	_, err := db.Exec(insertSql)
 	if err != nil {
 		return err
