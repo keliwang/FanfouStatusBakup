@@ -101,10 +101,10 @@ func main() {
 	checkError(err)
 	log.SetOutput(file)
 
-	var sinceId string
+	var maxId string
 	for {
 		resp, err := fanfouClient.Get("http://api.fanfou.com/statuses/user_timeline.json", map[string]string{
-			"mode": "lite", "count": "60"}, fanfouClient.Token)
+			"mode": "lite", "count": "60", "max_id": maxId}, fanfouClient.Token)
 		checkError(err)
 		defer resp.Body.Close()
 
@@ -124,7 +124,7 @@ func main() {
 		checkError(err)
 
 		// Get last status's id
-		sinceId = statuses[len(statuses)-1].Id
-		log.Printf("id: %s OK\n", sinceId)
+		maxId = statuses[len(statuses)-1].Id
+		log.Printf("id: %s OK\n", maxId)
 	}
 }
